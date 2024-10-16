@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 16 12:37:05 2024
+Created on Wed Oct 16 12:48:44 2024
 
 @author: 96160
 """
-
-# SuperFastPython.com
-# example of hashing a word list serially
+from math import ceil
 from hashlib import sha512
+from multiprocessing import Pool
 import time
 
  
@@ -32,12 +31,28 @@ def load_words(path):
  
 # entry point
 def main():
+    
+    #load the data 
     path = '1m_words.txt'
     words = load_words(path)
     print(f'Loaded {len(words)} words from {path}')
     
-    known_words = {hash_word(word) for word in words}
-    print(f'Done, with {len(known_words)} hashes')
- 
+    # seq
+    known_words_seq = {hash_word(word) for word in words}
+    start_time = time.perf_counter_ns()
+    end_time = time.perf_counter_ns()
+
+    print(f'Seq method Done, with {len(known_words_seq)} hashes in {end_time-start_time} nanosec')
+
+
+    #multi process
+    start_time = time.perf_counter_ns()
+    with Pool(1) as pool:
+        # create a set of word hashes
+        known_words_mul = pool.map_async(hash_word, words)
+    end_time = time.perf_counter_ns()
+
+    print(f'Mutiprocess method Done, with {len("known_words_mul")} hashes in {end_time-start_time} nanosec')
+
 if __name__ == '__main__':
     main()
